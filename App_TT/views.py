@@ -1,5 +1,15 @@
 from django.shortcuts import render,HttpResponse
 
 # Create your views here.
-def home(request):
+def login(request):
     return render(request, 'login.html')
+    
+
+
+
+
+
+
+def home(request):
+    pass
+
