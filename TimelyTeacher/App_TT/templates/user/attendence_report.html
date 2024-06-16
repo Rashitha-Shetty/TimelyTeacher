@@ -1,0 +1,183 @@
+{% extends "user/base.html" %}
+{% load static %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/user/attendence_report.css' %}">
+{% endblock styles %}
+
+{% block maincontent %}
+<h1>Attendance Report</h1>
+<center>
+    <div class="ask-report">
+
+        {% comment %} <label for="classSelect">Select Class:</label> {% endcomment %}
+        <select id="classSelect" onchange="updateSubjects()">
+            <option value="">Select a class</option>
+            {% for class in subjects %}
+            <option value="{{ class.ClassId }}">{{ class.ClassId }}</option>
+            {% endfor %}
+        </select>
+        <br><br>
+        {% comment %} <label for="subjectSelect">Select Subject:</label> {% endcomment %}
+        <select id="subjectSelect">
+            <option value="">Select a subject</option>
+            <!-- Options will be populated dynamically based on selected class -->
+        </select>
+
+    </div>
+    <button onclick="renderReport()">Generate Report</button>
+    <br><br>
+    <div id="report">
+        <!-- Tables will be injected here by JavaScript -->
+    </div>
+</center>
+{% endblock maincontent %}
+
+{% block script %}
+<script>
+
+let data = [];
+let subjects = [];
+
+function addAttendanceRecord(ClassId, Date, Hour, Name, Rollno, Subject, is_present) {
+    data.push({
+        ClassId: ClassId,
+        Date: Date,
+        Hour: Hour,
+        Name: Name,
+        Rollno: Rollno,
+        Subject: Subject,
+        id: generateId(),
+        is_present: is_present
+    });
+}
+
+function generateId() {
+    return 'id-' + Math.random().toString(36).substr(2, 16);
+}
+
+function updateSubjects() {
+    const classId = document.getElementById('classSelect').value;
+    const subjectSelect = document.getElementById('subjectSelect');
+    subjectSelect.innerHTML = '<option value="">Select a subject</option>'; // Clear previous options
+
+    if (classId) {
+        const filteredSubjects = subjects.filter(subject => subject.classId == classId);
+        if (filteredSubjects.length === 0) {
+            const option = document.createElement('option');
+            option.value = "";
+            option.textContent = "No assigned subjects";
+            subjectSelect.appendChild(option);
+        } else {
+            filteredSubjects.forEach(subject => {
+                const option = document.createElement('option');
+                option.value = subject.name;  // assuming subject.name is unique
+                option.textContent = `${subject.name}`;
+                subjectSelect.appendChild(option);
+            });
+        }
+    }
+}
+
+function renderReport() {
+    const classId = document.getElementById('classSelect').value;
+    const subject = document.getElementById('subjectSelect').value;
+    const students = {};
+    const uniqueSessions = new Set();
+
+    if (!classId || !subject) {
+        alert('Please select both class and subject');
+        return;
+    }
+
+    data.forEach(record => {
+        if (record.ClassId === classId && record.Subject === subject) {
+            const sessionKey = `${record.Date}-${record.Hour}`;
+            uniqueSessions.add(sessionKey);
+            if (!students[record.Name]) {
+                students[record.Name] = {
+                    rollno: record.Rollno,
+                    attended: 0
+                };
+            }
+            if (record.is_present === 'True') {
+                students[record.Name].attended++;
+            }
+        }
+    });
+
+    const totalClasses = uniqueSessions.size;
+
+    const reportDiv = document.getElementById('report');
+    reportDiv.innerHTML = ''; // Clear existing content
+
+    if (Object.keys(students).length === 0) {
+        reportDiv.innerHTML = '<p>No records found for the selected class and subject.</p>';
+        return;
+    }
+
+    const summary = document.createElement('div');
+    summary.className = 'summary';
+    summary.innerHTML = `
+        <p>Subject: ${subject}</p>
+        <p>Total Classes: ${totalClasses}</p>
+    `;
+    reportDiv.appendChild(summary);
+
+    const tableContainer = document.createElement('div');
+    tableContainer.className = 'table-container';
+
+    const table = document.createElement('table');
+    const thead = document.createElement('thead');
+    const tbody = document.createElement('tbody');
+
+    thead.innerHTML = `
+        <tr>
+            <th>Student Name</th>
+            <th>Roll No</th>
+            <th>Classes Attended</th>
+        </tr>
+    `;
+
+    Object.keys(students).forEach(name => {
+        const student = students[name];
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${name}</td>
+            <td>${student.rollno}</td>
+            <td>${student.attended}</td>
+        `;
+        tbody.appendChild(row);
+    });
+
+    table.appendChild(thead);
+    table.appendChild(tbody);
+
+    tableContainer.appendChild(table);
+    reportDiv.appendChild(tableContainer);
+}
+
+{% for each in data %}
+addAttendanceRecord(
+"{{ each.ClassId }}",
+"{{ each.Date }}",
+"{{ each.Hour }}",
+"{{ each.Name }}",
+"{{ each.Rollno }}",
+"{{ each.Subject }}",
+"{{ each.is_present }}"
+);
+{% endfor %}
+
+subjects = [
+    {% for subject in subjects %}
+    {
+        classId: "{{ subject.ClassId }}",
+        name: "{{ subject.Subject }}",
+        teacher: "{{ subject.Username }}"
+    },
+    {% endfor %}
+];
+
+</script>
+{% endblock script %}

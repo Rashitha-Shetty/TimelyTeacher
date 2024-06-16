@@ -1,0 +1,92 @@
+/* General Styles */
+
+.body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    min-height: 100vh;
+}
+#schedule-container{
+    width: 60vw;
+}
+
+
+
+.day-button {
+    display: block;
+    width: 80%;
+    padding: 10px;
+    margin: 10px;
+    background-color: #007bff;
+    color: #fff;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    border-radius: 5px;
+}
+
+.day-button:hover {
+    background-color: #0056b3;
+}
+
+.container {
+    max-width: 60vw; /* Set the max-width to 60% of the viewport width */
+    width: 100%; /* Ensure the container takes full width */
+    margin: 20px auto;
+}
+
+.day-card {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 20px 0;
+    width: calc(100% - 200px); /* Adjust width to fit within 60vw */
+    margin-left: 200px; /* Ensure the card doesn't overlap with the sidebar */
+}
+
+.day-card h2 {
+    background-color: #2f323a;
+    color: #fff;
+    padding: 10px;
+    margin: 0;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.subject-item {
+    padding: 5px;
+    border-bottom: 1px solid #eee;
+}
+
+.timings {
+    font-weight: bold;
+    color: #555;
+}
+
+.teacher-dropdown,
+.class-dropdown,
+.subject-dropdown {
+    width: 40%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin: 10px;
+}
+
+/* Responsive Styles */
+
+@media only screen and (max-width: 1000px) {
+    .container {
+        max-width: 90%;
+    }
+    .day-card {
+        width: 70vw;
+        margin-left: 0;
+    }
+}
+

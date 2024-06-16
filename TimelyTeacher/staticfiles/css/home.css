@@ -1,0 +1,60 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #ffffff;
+  }
+
+  .header {
+    text-align: center;
+    color: #333333;
+    padding: 20px;
+    margin-bottom: 20px;
+    font-family: 'Times New Roman', Times, serif;
+  }
+
+  .container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .card {
+    width: 300px;
+    background-color: #00dbd126;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px;
+    text-align: center;
+    position: relative;
+    transition: box-shadow 0.3s ease;
+    cursor: pointer; /* Add cursor pointer for clickable effect */
+  }
+
+  .card:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .card h2 {
+    color: #333333;
+  }
+
+  .card p {
+    color: #666666;
+  }
+
+  .user-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 20px;
+  }
+
+  @media screen and (max-width: 600px) {
+    .card {
+      width: calc(100% - 20px);
+    }
+  }

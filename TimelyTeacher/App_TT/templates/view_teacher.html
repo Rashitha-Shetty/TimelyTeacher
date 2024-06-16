@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% load static  %}
+
+{% block styles %}  
+    <link rel="stylesheet" href="{% static 'css/view_teachers.css' %}">
+{% endblock styles %}
+
+{% block nav_content %}
+
+<br><br><br><br><br>
+
+    <a href="teachers"><i class="fas fa-chalkboard-teacher"></i><span>Manage Teachers</span></a>
+    <a href="class"><i class="fas fa-user-graduate"></i><span>Manage Class</span></a>
+
+    <br><br><br><br><br>
+    <a href="logout" onclick="confirmLogOut()" class="down"><i class="fas fa-bullhorn"></i><span>Log Out</span></a>
+
+{% endblock nav_content %}
+
+{% block maincontent %}
+<div class="container">
+    <center><h3>TEACHER</h3></center>
+    <br />
+    <form method="post" action="{% url 'teachers'%}">
+      {% csrf_token %}
+
+      <label for="teacher-name">Teacher Name</label>
+      <input type="text" name="name" value="{{data.Name}}" required disabled />
+      <br />
+
+      <label for="department">Department</label>
+      <input type="text" id="dept" name="department" value="{{data.Department}}"required disabled />
+      <br />
+
+      <label for="phoneNumber">Phone Number</label>
+      <input
+        type="tel"
+        id="phoneNumber"
+        name="phoneno"
+        value="{{data.Phoneno}}"
+        pattern="\d{10}"
+        maxlength="10"
+        minlength="10"
+        
+        required disabled
+      /><br /><br>
+      <h2>Login Credentials</h2>
+
+      <label for="username">Username</label>
+      <input
+        type="text"
+        name="username"
+        value="{{data.Username}}"
+        required disabled
+      />
+
+      <label for="password">Password</label>
+      <input
+        type="password"
+        id="password"
+        value="{{data.Password}}"
+        name="password"
+
+        required disabled
+      />
+
+      <label for="confirmPassword">Confirm Password</label>
+      <input
+        type="password"
+        id="confirmPassword"
+        name="confirmPassword"
+        value="{{data.Password}}"
+        required disabled
+      /><br /><br />
+
+      <input type="hidden" name="docid" value="{{data.docid}}">
+
+      
+      <button id="editCancelButton" type="button" name="edit">Edit</button>
+      
+        <button type="submit" name="delete" onclick="return confirmDelete()">Delete</button>
+        <button
+          type="submit"
+          id="saveButton"
+          name="saveButton"
+          class="hide"
+          onclick="return checkPassword()">Save</button>
+    
+    </form>
+  </div>
+  {% endblock maincontent %}
+
+
+{% block script %}
+<script>
+    document.querySelector('#editCancelButton').addEventListener('click', function(event) {
+        event.preventDefault();
+        var editCancelButton = document.getElementById('editCancelButton');
+        var editMode = editCancelButton.textContent === 'Edit';
+        var inputs = document.querySelectorAll('.container form input');
+        
+        inputs.forEach(function(input) {
+          input.disabled = !editMode;
+        });
+        
+        editCancelButton.textContent = editMode ? 'Cancel' : 'Edit';
+        
+        document.getElementById('saveButton').classList.toggle('hide');
+    
+    
+      });
+    
+    
+      function confirmDelete() {
+        // Prompt the user for confirmation
+        var result = confirm("Are you sure you want to delete?");
+    
+        // If user confirms, proceed with form submission
+        if (result) {
+          return true;
+        } else {
+          // If user cancels, prevent the form submission
+          return false;
+        }
+      }
+      function checkPassword() {
+        var password = document.getElementById("password").value;
+        var confirmPassword = document.getElementById("confirmPassword").value;
+    
+        if (password != confirmPassword) {
+            alert("Passwords do not match!");
+            return false;
+        }
+        return true;
+    }
+</script>
+
+{% endblock script %}

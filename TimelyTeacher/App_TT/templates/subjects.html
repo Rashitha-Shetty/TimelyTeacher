@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/subjects.css' %}">
+<link rel="stylesheet" href="{% static 'css/man_class.css' %}">
+{% endblock styles %}
+{% block nav_content %}
+
+<br><br><br><br><br>
+
+    <a href="#" onclick="submitForm('studentsForm')"><i class="fas fa-user-graduate"></i><span>Students</span></a>
+    <a href="#" onclick="submitForm('subjectsForm')"><i class="fas fa-chalkboard-teacher"></i><span>Subjects</span></a>
+    <a href="#" onclick="submitForm('timetableForm')"><i class="fas fa-calendar-alt"></i><span>Timetable</span></a>
+    <a href="#" onclick="submitForm('card4Form')"><i class="fas fa-folder"></i><span>Attendance</span></a>
+
+
+    <br><br><br><br><br>
+    <a href="/manage"><i class="fas fa-desktop"></i><span>Home</span></a>
+    <a href="logout" onclick="confirmLogOut()" class="down"><i class="fas fa-bullhorn"></i><span>Log Out</span></a>
+
+
+
+    <form id="studentsForm" action="{% url 'students' %}" method="get" style="display: none;">
+        <h2 style="color: #FF5733;">Manage Students</h2>
+        <input type="hidden" name="classid" value="{{ classid }}">
+    </form>
+    <form id="subjectsForm" action="{% url 'subjects' %}" method="post" style="display: none;">
+        {% csrf_token %}
+        <h2 style="color: #33B5FF;">Manage Subjects</h2>
+        <input type="hidden" name="classid" value="{{ classid }}">
+    </form>
+    <form id="timetableForm" action="{% url 'timetable' %}" method="post" style="display: none;">
+        {% csrf_token %}
+        <h2 style="color: #33FF57;">Manage Timetable</h2>
+        <input type="hidden" name="classid" value="{{ classid }}">
+    </form>
+    <form id="card4Form" action="{% url 'viewattendence' %}" method="post" style="display: none;">
+        {% csrf_token %}
+        <h2 style="color: #FF33A8;">Card Title 4</h2>
+        <input type="hidden" name="classid" value="{{ classid }}">
+    </form>
+
+    
+    <script>
+        function submitForm(formId) {
+            document.getElementById(formId).submit();
+        }
+    </script>
+
+
+{% endblock nav_content %}
+
+{% block maincontent %}
+<center><h2 id="noSubjects" {% if data %}style="display: none;"{% endif %}>No subjects</h2></center>
+
+<div id="formsContainer">
+  {% for each in data %}
+    <form method="post" action ="{% url 'subjects'%}" class="container">
+      {% csrf_token %} 
+      <input type="hidden" name="docid" value="{{each.id}}">
+      <input type="hidden" name="classid" value="{{classid}}">
+      <div class="form-group">
+        <label>Subject:</label>
+        <input type="text" name="subject" placeholder="Enter text..." value="{{ each.Subject }}" disabled>
+      </div>
+      <div class="form-group">
+        <label>Teacher:</label>
+        <select name="teacher" disabled>
+          {% for i in teacher %}
+          <option value="{{i.Username}}" {% if i.Username == each.Username %}selected{% endif %}>{{i.Name}}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="updateBtn" id="saveBtn" name="updatebtn" style="display:none;">Update</button>
+      <button type="submit" class="deleteBtn"  name="deletebtn" style="display:none;">Delete</button>
+    </form>
+  {% endfor %}
+</div>
+
+{% comment %} popup {% endcomment %}
+<div class="popup hide" id="popup">
+  <!-- Close button (X) -->
+  <button type="button" id="closeButton" class="cls" onclick="closeForm()">x</button>
+  
+  <form method="post" action="{% url 'subjects'%}">
+      {% csrf_token %}
+      <input type="hidden" name="classid" value={{classid}}>
+      <h4>Add Subjects</h4>
+      <div class="input-group">
+        <br>
+          <label for="subject">Subject:</label>
+          <input type="text"name="subject" required>
+      </div>
+      
+      <div class="input-group">
+          <label for="year">Teacher:</label>
+          <select name="teacher">
+            {% for each in teacher %}
+            <option value="{{each.Username}}" >{{each.Name}}</option>
+            {% endfor %}
+          </select>
+      </div>
+
+      <button type="submit" class="saveclass" name="savesub">Save</button>
+  </form>
+</div>
+
+<button id="editButton" class="editButton">✏️</button>
+<button id="set_float" class="set_float">+</button>
+
+{% endblock maincontent %}
+
+{% block script %}
+<script src="{% static 'script/man_class.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const editButton = document.getElementById('editButton');
+  const forms = document.querySelectorAll('.container');
+  let isEditMode = false; // Variable to track edit mode
+
+  editButton.addEventListener('click', function() {
+    isEditMode = !isEditMode; // Toggle edit mode
+    if (isEditMode) {
+      // Switch to edit mode
+      editButton.textContent = '👍'; // Change button text
+      forms.forEach(form => {
+        form.querySelectorAll('input, select').forEach(input => {
+          input.removeAttribute('disabled');
+        });
+        form.querySelector('#saveBtn').style.display = 'inline-block';
+        form.querySelector('.deleteBtn').style.display = 'inline-block';
+      });
+    } else {
+      // Switch to normal mode
+      editButton.textContent = '✏️'; // Change button text back
+      forms.forEach(form => {
+        form.querySelectorAll('input, select').forEach(input => {
+          input.setAttribute('disabled', 'disabled');
+        });
+        form.querySelector('#saveBtn').style.display = 'none';
+        form.querySelector('.deleteBtn').style.display = 'none';
+      });
+    }
+  });
+
+  forms.forEach(form => {
+    const saveBtn = form.querySelector('#saveBtn');
+    const deleteBtn = form.querySelector('.deleteBtn');
+
+    saveBtn.addEventListener('click', function() {
+      // Implement save functionality here
+    });
+
+    deleteBtn.addEventListener('click', function() {
+      // Implement delete functionality here
+    });
+  });
+});
+</script>
+{% endblock script %}

@@ -1,0 +1,125 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block meta %}{% endblock meta %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/user/base.css' %}">
+    {% block styles %}{% endblock styles %}
+</head>
+<body>
+  <div id="loading-spinner" class="loading-spinner hide"></div> 
+
+  {% if logOut %}
+    <script>
+        // Remove an item from local storage
+        localStorage.removeItem("username");
+        localStorage.removeItem("password");
+        window.location.href = '/home';
+    </script>
+   
+
+    {% elif saveLogin %}
+      <script>
+            // Ensure username and password are properly quoted and escaped
+          var username = "{{ username|escapejs }}";
+          var password = "{{ password|escapejs }}";
+          console.log(username, password);
+          localStorage.setItem("username", username);
+          localStorage.setItem("password", password);
+      </script>
+
+    {% elif not home %} 
+      <script>
+          // To retrieve the saved data later:
+          let savedUsername = localStorage.getItem("username");
+          let savedPassword = localStorage.getItem("password");
+
+          if (savedUsername && savedPassword) {}
+          else{
+            //redirect to home
+            console.log("hear")
+            window.location.href = '/home';
+          }
+      </script>
+
+    {% endif %}
+    
+   
+
+    
+
+    
+    {% for msg in messages %}
+        <div class="message-box-alert" id="messageBox">
+            <p class="message-text">{{msg}}</p>
+        </div>
+    {% endfor %}
+
+    
+    <input type="checkbox" id="check">
+ 
+
+  <!--sidebar start-->
+  <label for="check">
+    <i class="fas fa-bars" id="sidebar_btn"></i>
+  </label>
+  <div class="sidebar">
+    <center>
+      <img src="{% static 'images/user.png' %}" class="profile_image" alt="">
+      <h4 id="username"></h4>
+    </center>
+
+
+  <form id="schedule" action="{% url 'schedule' %}" method="post" style="display: none;">
+      {% csrf_token %}
+      <input type="hidden" name="username" value="{{ username }}">
+  </form>
+  <form id="attendence" action="{% url 'attendence' %}" method="post" style="display: none;">
+      {% csrf_token %}
+      <input type="hidden" name="username" value="{{ username }}">
+  </form>
+  <form id="attendencereport" action="{% url 'attendencereport' %}" method="post" style="display: none;">
+      {% csrf_token %}
+      <input type="hidden" name="username" value="{{ username }}">
+  </form>
+
+    {% block extra_nav %}    
+    <br>
+    {% endblock extra_nav %}
+  
+
+    <a href="#" onclick="submitForm('schedule')"><i class="fas fa-desktop"></i><span>Schedule</span></a>
+    <a href="#" onclick="submitForm('attendence')"><i class="fas fa-chalkboard-teacher"></i><span>Mark Attendence</span></a>
+    <a href="#" onclick="submitForm('attendencereport')"><i class="fas fa-address-card"></i><span>Attendance Report</span></a>
+    <br><br>
+    <a href="logout" onclick="confirmLogOut()"><i class="fas fa-bullhorn"></i><span>Log Out</span></a>
+  </div>
+
+  <!--sidebar end-->
+
+  <!--content start-->
+  <div class="content">
+    <center>
+      {% comment %} {{username}} {% endcomment %}
+        {% block maincontent %}{% endblock maincontent %}
+    </center>
+  </div>
+  
+  <script src="{% static 'script/user/base.js' %}"></script>
+  
+  {% block script %}{% endblock script %}
+  <script>
+    document.getElementById("username").textContent=localStorage.getItem("username");
+  </script>
+
+  <script>
+    function submitForm(formId) {
+        document.getElementById(formId).submit();
+    }
+  </script>
+
+</body>
+</html>

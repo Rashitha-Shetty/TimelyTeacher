@@ -1,0 +1,66 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 400px;
+  margin: 50px auto;
+  padding: 30px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.input-section {
+  margin-bottom: 20px;
+}
+
+h3 {
+  margin-top: 0;
+  color: #bc9fff;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  color: #666;
+}
+
+input {
+  width: calc(100% - 22px); /* Adjust for input padding */
+  padding: 10px;
+  border: 1px solid #ccc;
+  background-color: #fdfaff;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+input[type="text"],
+input[type="password"] {
+  margin-bottom: 10px;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  background-color: #c9b6f4;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #bb8aff;
+}
+
+/* Responsive Layout */
+@media screen and (max-width: 600px) {
+  .container {
+    max-width: 90%;
+  }
+}

@@ -1,0 +1,64 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f5f7fa; /* Light grey background for better contrast */
+  margin: 0;
+  padding: 0;
+  color: #333; /* Slightly darker text color for better readability */
+}
+
+/* Style for the box */
+.box {
+  width: 40vw;
+  margin: 20px auto;
+  padding: 8px; /* Increased padding for better spacing */
+  background: linear-gradient(145deg, #f6f2ff, #d9d5e5); /* Lavender gradient background */
+  border: 2px solid #b5acbf; /* Lighter lavender border color */
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  transition: border 0.3s ease, background 0.3s ease; /* Smooth transition on hover */
+}
+
+.box:hover {
+  background: linear-gradient(145deg, #e6e2f5, #c9c5d5); /* Slightly darker lavender gradient on hover */
+  border: 2px solid #8e8594; /* Darker lavender border on hover */
+}
+
+/* Container to center content vertically */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full viewport height */
+}
+
+/* Style for the add button */
+.add-button {
+  position: fixed;
+  bottom: 100px;
+  right: 40px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #6bf5ff, #48d1e0); /* Gradient background */
+  color: #ffffff;
+  font-size: 30px; /* Larger font size for better visibility */
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease; /* Smooth transition for background and transform */
+}
+
+.add-button:hover {
+  background: linear-gradient(145deg, #90d4ff, #6abbe6); /* Slightly darker gradient on hover */
+  transform: scale(1.1); /* Slightly enlarge the button on hover */
+}
+
+/* Responsive Layout */
+@media screen and (max-width: 600px) {
+  .add-button {
+    bottom: 80px;
+    right: 20px; /* Adjusted positioning for smaller screens */
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+  }
+}

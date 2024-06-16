@@ -1,0 +1,135 @@
+{% extends "user/base.html" %}
+{% load static %}
+
+{% block meta %}
+  <meta name="csrf-token" content="{{ csrf_token }}" />
+{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static "css/user/attendence.css" %}">
+{% endblock styles %}
+
+{% block maincontent %}
+<div class="class-info">
+    <h2>Class Date: {{ date }}</h2>
+</div>
+<div class="class-info">
+    <h2>Hour: {{ hour }}</h2>
+</div>
+<div class="class-info">
+    <h2>Class ID: {{ ClassId }}</h2>
+</div>
+<div class="class-info">
+    <h2>Subject: {{ subject }}</h2>
+</div>
+
+
+        <table id="attendance-table">
+            <thead>
+                <tr>
+                    <th>Roll No</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>{{student.Rollno}}</td>
+                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{student.Name}}</td>
+                    <td><button class="present" onclick="toggleAttendance(this)">Present</button></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button id="save-button">Save</button> 
+
+{% endblock maincontent %}
+
+
+{% block script %}
+
+<script>
+    function toggleAttendance(button) {
+        if (button.classList.contains("present")) {
+            button.classList.remove("present");
+            button.classList.add("absent");
+            button.textContent = "Absent";
+        } else {
+            button.classList.remove("absent");
+            button.classList.add("present");
+            button.textContent = "Present";
+        }
+    }
+
+
+     // Function to save timetable data as JSON
+     function getCSRFToken() {
+        return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    }
+
+    document.getElementById("save-button").addEventListener("click", function() {
+        showLoadingSpinner()
+        // Create an array to store student data
+        let studentData = [];
+
+        // Select all table rows except the header row
+        let rows = document.querySelectorAll("#attendance-table tbody tr");
+
+        // Loop through each table row
+        rows.forEach(row => {
+            // Get the Roll No, Name, and Status of the student
+            let rollNo = row.cells[0].textContent;
+            let name = row.cells[1].textContent;
+            let status = row.cells[2].querySelector("button").textContent=="Present"?true:false;
+
+            // Add student data to the array
+            studentData.push({
+                "ClassId":"{{ClassId}}",
+                "Rollno": rollNo,
+                "Name": name,
+                "Date": "{{date}}",
+                "Hour": {{hour}},
+                "Subject": "{{subject}}",
+                "is_present": status
+            });
+        });
+
+        // Log the student data in JSON format
+        console.log(JSON.stringify(studentData, null, 2));
+
+        const csrftoken = getCSRFToken();
+        const formData = {
+            data: studentData
+        };
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '{% url "saveAttendence" %}', true);
+        xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+        xhr.setRequestHeader('X-CSRFToken', csrftoken);
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    alert('Attendance Updated successfully.');
+                    hideLoadingSpinner()
+                    //location.reload(); // Reload the page to see the imported data
+                } else {
+                    alert('Failed to Update Attendance');
+                    hideLoadingSpinner()
+
+                }
+            }
+        };
+
+        xhr.send(JSON.stringify(formData));
+
+
+
+    });
+
+
+</script>
+
+{% endblock script %}
+

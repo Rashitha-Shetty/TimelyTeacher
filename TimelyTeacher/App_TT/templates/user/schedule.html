@@ -1,0 +1,193 @@
+{% extends "user/base.html" %}
+{% load static %}
+
+{% block styles %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link rel="stylesheet" href="{% static 'css/timetables.css'%}">
+<link rel="stylesheet" href="{% static 'css/user/schedule.css'%}">
+{% endblock styles %}
+
+{% block extra_nav %}
+<a href="#" onclick="showDay('Monday')"><i>M</i><span>-Monday</span></a>
+<a href="#" onclick="showDay('Tuesday')"><i>T</i><span>-Tuesday</span></a>
+<a href="#" onclick="showDay('Wednesday')"><i>W</i><span>-Wednesday</span></a>
+<a href="#" onclick="showDay('Thursday')"><i>T</i><span>-Thursday</span></a>
+<a href="#" onclick="showDay('Friday')"><i>F</i><span>-Friday</span></a>
+<a href="#" onclick="showDay('Saturday')"><i>S</i><span>-Saturday</span></a>
+<br><br>
+{% endblock extra_nav %}
+
+{% block maincontent %}
+<div class="body">
+    <div id="schedule-container"></div>
+</div>
+{% endblock maincontent %}
+
+{% block script %}
+<script>
+    var timetableDataFromServer = {{ timetable|safe }}; // Add this line to get the timetable data from the server
+    console.log(timetableDataFromServer)
+
+    let days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    let startTime = 8;
+    let startMinute = 30;
+    let numberOfSubjects = 8;
+
+    let selectedValues = {}; // Object to store selected values for each day and slot
+
+    function createTimeSlots(startHour, startMinute, numberOfSlots) {
+        let times = [];
+        for (let i = 0; i < numberOfSlots; i++) {
+
+            if (startHour === 12 && startMinute === 30) {
+                startHour++;
+                continue;
+            }
+
+            let endHour = startHour + 1;
+            let start = `${startHour}:${startMinute < 10 ? '0' + startMinute : startMinute}`;
+            let end = `${endHour}:${startMinute < 10 ? '0' + startMinute : startMinute} `;
+
+           
+
+            
+            if (endHour > 12) {
+                endHour -= 12;
+                end = `${endHour}:${startMinute < 10 ? '0' + startMinute : startMinute} `;
+            }
+            if (startHour > 12) {
+                startHour -= 12;
+                start = `${startHour}:${startMinute < 10 ? '0' + startMinute : startMinute} `;
+            }
+
+
+            times.push(`${start} - ${end}`);
+            startHour++;
+        }
+        return times;
+    }
+
+    function createSchedule(day) {
+        let scheduleContainer = document.getElementById('schedule-container');
+        let dayCard = document.createElement('div');
+        dayCard.className = 'day-card';
+        dayCard.id = day;
+        dayCard.classList.add('hide');
+
+        let dayTitle = document.createElement('h2');
+        dayTitle.textContent = day;
+        dayCard.appendChild(dayTitle);
+
+        let timeSlots = createTimeSlots(startTime, startMinute, numberOfSubjects);
+        timeSlots.forEach((slot, index) => {
+            let subjectItem = document.createElement('div');
+            subjectItem.className = 'subject-item';
+            subjectItem.classList.add('hide')
+
+            let timingDiv = document.createElement('div');
+            timingDiv.className = 'timings';
+            timingDiv.textContent = slot;
+            subjectItem.appendChild(timingDiv);
+
+            let subjectDropdown = document.createElement('select');
+            subjectDropdown.className = 'subject-dropdown';
+            subjectDropdown.setAttribute('data-day', day); // Set data-day attribute
+            subjectDropdown.setAttribute('data-index', index); // Set data-index attribute
+
+            subjectDropdown.disabled = true;
+            subjectItem.appendChild(subjectDropdown);
+
+            let classDropdown = document.createElement('select');
+            classDropdown.className = 'class-dropdown';
+            classDropdown.setAttribute('data-day', day); // Set data-day attribute
+            classDropdown.setAttribute('data-index', index); // Set data-index attribute
+
+            classDropdown.disabled = true;
+            subjectItem.appendChild(classDropdown);
+
+            dayCard.appendChild(subjectItem);
+        });
+
+        scheduleContainer.appendChild(dayCard);
+    }
+
+    function saveSelectedValue(day, index, type, value) {
+        let dayCard = document.getElementById(day); // Get the day-card for the current day
+        let subjectItems = dayCard.querySelectorAll(".subject-item"); // Get all subject-items for the current day
+
+        // Ensure the index does not exceed the number of subject-items
+        if (index < subjectItems.length) {
+            subjectItems[index].classList.remove("hide"); // Remove the 'hide' class for the subject-item at the specified index
+        }
+        
+        if (!selectedValues[day]) {
+            selectedValues[day] = [];
+        }
+        if (!selectedValues[day][index]) {
+            selectedValues[day][index] = {};
+        }
+        selectedValues[day][index][type] = value;
+    }
+
+    function showDay(day) {
+        let all = document.querySelectorAll(".day-card");
+        all.forEach(card => {
+            card.classList.add("hide");
+        });
+        document.getElementById(day).classList.remove("hide");
+    }
+
+    // Populate the dropdowns based on timetable data from the server
+    function populateTimetable() {
+        for (let key in timetableDataFromServer) {
+            if (timetableDataFromServer.hasOwnProperty(key)) {
+                let [day, index] = key.split('_');
+                index = parseInt(index, 10);
+                let subject = timetableDataFromServer[key].Subject;
+                let classId = timetableDataFromServer[key].ClassId;
+
+                saveSelectedValue(day, index, 'subject', subject);
+                saveSelectedValue(day, index, 'classId', classId);
+            }
+        }
+
+       
+
+        for (let key in selectedValues) {
+            if (selectedValues.hasOwnProperty(key)) {
+                let dayCard = document.getElementById(key);
+                selectedValues[key].forEach((value, index) => {
+                    let subjectDropdown = dayCard.querySelector(`.subject-dropdown[data-index="${index}"]`);
+                    let classDropdown = dayCard.querySelector(`.class-dropdown[data-index="${index}"]`);
+                    let subjectItem = subjectDropdown.closest('.subject-item');
+
+                    if (value.subject) {
+                        subjectDropdown.innerHTML = `<option value="${value.subject}">${value.subject}</option>`;
+                        subjectDropdown.value = value.subject;
+                    } else {
+                        subjectItem.classList.add('hide');
+                    }
+
+                    if (value.classId) {
+                        classDropdown.innerHTML = `<option value="${value.classId}">${value.classId}</option>`;
+                        classDropdown.value = value.classId;
+                    } else {
+                        classDropdown.classList.add('hidden');
+                    }
+
+                    if (!value.subject && !value.classId) {
+                        subjectItem.classList.add('hide');
+                    }
+                });
+            }
+        }
+    }
+
+    // By default, show Monday's schedule
+    days.forEach(day => {
+        createSchedule(day);
+    });
+    showDay("Monday");
+    populateTimetable();
+</script>
+{% endblock script %}

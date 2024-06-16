@@ -1,0 +1,111 @@
+{% extends "user/base.html" %}
+{% load static %}
+{% block styles %}
+    <link rel="stylesheet" href="{% static "css/user/attendence.css" %}">
+{% endblock styles %}
+
+{% block maincontent %}
+    <div class="container">
+        <h1>Attendance Marking System</h1>
+        <form method="POST" action="{% url 'attendence' %}">
+            {% csrf_token %}
+            <input type="hidden" name="username" value={{username}}>
+            <label for="date">Date:</label>
+            <input type="date" id="date" name="date" required><br><br>
+    
+            <label for="hour">Select Hour:</label>
+            <select id="hour" name="hour" required>
+                <option value="">Select Hour</option>
+                <option value="0">08:30 - 09:30 AM</option>
+                <option value="1">09:30 - 10:30 AM</option>
+                <option value="2">10:30 - 11:30 AM</option>
+                <option value="3">11:30 - 12:30 PM</option>
+                <option value="4">01:30 - 02:30 PM</option>
+                <option value="5">02:30 - 03:30 PM</option>
+                <option value="6">03:30 - 04:30 PM</option>
+            </select><br><br>
+    
+            <label for="class">Select Class:</label>
+            <select id="class" name="class"  onchange="updateSubjects()" required>
+                <option value="">Select Class</option>
+                {% for c in subjects %}
+                <option value="{{c.ClassId}}">{{c.ClassId}}</option>
+                {% endfor %}
+            </select><br><br>
+            <label for="class">Select a Subject:</label>
+            <select id="subjectSelect" name="subject" required>
+                <option value="">Select a subject</option>
+                <!-- Options will be populated dynamically based on selected class -->
+            </select><br><br>
+    
+            {% comment %} <label for="subject">Subject:</label>
+            <input type="text" id="subject" name="subject" readonly><br><br> {% endcomment %}
+    
+            <button type="submit" name="takeAttendance">Submit</button>
+        </form>
+    
+       
+    </div>
+{% endblock maincontent %}
+
+{% block script %}
+
+{% comment %} <script>
+    let subjects = {{ subjects|safe }};
+    
+    // Get references to the select elements
+    const classSelect = document.getElementById('class');
+    const subjectInput = document.getElementById('subject');
+    
+    // Add event listener to the class select box
+    classSelect.addEventListener('change', function() {
+        // Get the selected class value
+        const selectedClassId = this.value;
+        
+        // Find the corresponding subject for the selected class
+        const selectedSubject = subjects.find(c => c.ClassId === selectedClassId);
+        
+        // Update the subject input value
+        subjectInput.value = selectedSubject ? selectedSubject.Subject : '';
+    });
+</script> {% endcomment %}
+<script>
+    let subjects = [];
+
+
+    function updateSubjects() {
+        const classId = document.getElementById('class').value;
+        const subjectSelect = document.getElementById('subjectSelect');
+        subjectSelect.innerHTML = '<option value="">Select a subject</option>'; // Clear previous options
+
+        if (classId) {
+            const filteredSubjects = subjects.filter(subject => subject.classId == classId);
+            if (filteredSubjects.length === 0) {
+                const option = document.createElement('option');
+                option.value = "";
+                option.textContent = "No assigned subjects";
+                subjectSelect.appendChild(option);
+            } else {
+                filteredSubjects.forEach(subject => {
+                    const option = document.createElement('option');
+                    option.value = subject.name;  // assuming subject.name is unique
+                    option.textContent = `${subject.name}`;
+                    subjectSelect.appendChild(option);
+                });
+            }
+        }
+    }
+
+    subjects = [
+        {% for subject in subjects %}
+        {
+            classId: "{{ subject.ClassId }}",
+            name: "{{ subject.Subject }}",
+            teacher: "{{ subject.Username }}"
+        },
+        {% endfor %}
+    ];
+
+</script>
+
+{% endblock script %}

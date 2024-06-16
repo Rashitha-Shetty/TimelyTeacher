@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/add_teachers.css' %}">
+{% endblock styles %}
+
+{% block nav_content %}
+<br><br><br><br><br>
+    <a href="teachers"><i class="fas fa-chalkboard-teacher"></i><span>Manage Teachers</span></a>
+    <a href="class"><i class="fas fa-user-graduate"></i><span>Manage Class</span></a>
+    <br><br><br><br><br>
+    <a href="logout" onclick="confirmLogOut()" class="down"><i class="fas fa-bullhorn"></i><span>Log Out</span></a>
+{% endblock nav_content %}
+
+{% block maincontent %}
+<div class="container">
+  <center><h3>ADD TEACHERS</h3></center>
+  <br />
+  <form method="post" action="{% url 'teachers' %}" onsubmit="return validateForm()">
+    {% csrf_token %}
+    <label for="teacher-name">Teacher Name</label>
+    <input type="text" name="name" value="{{data.Name}}" required />
+    <br />
+
+    <label for="department">Department</label>
+    <input type="text" id="dept" name="department" value="{{data.Department}}" required />
+    <br />
+
+    <label for="phoneNumber">Phone Number</label>
+    <input
+      type="tel"
+      id="phoneNumber"
+      name="phoneno"
+      value="{{data.Phoneno}}"
+      pattern="\d{10}"
+      maxlength="10"
+      minlength="10"
+      required
+    /><br /><br>
+    <h3>Login Credentials</h3>
+
+    <label for="username">Username</label>
+    <input
+      type="text"
+      name="username"
+      value="{{data.Username}}"
+      required
+    />
+
+    <label for="password">Password</label>
+    <input
+      type="password"
+      id="password"
+      name="password"
+      value="{{data.Password}}"
+      required
+    />
+
+    <label for="confirmPassword">Confirm Password</label>
+    <input
+      type="password"
+      id="confirmPassword"
+      name="confirmPassword"
+      value="{{data.Password}}"
+      required
+    /><br /><br />
+
+    <button
+      type="submit"
+      id="Button"
+      name="addteacher"
+      onclick="return checkPassword()"
+    >
+      Add
+    </button>
+  </form>
+</div>
+{% endblock maincontent %}
+
+{% block script %}
+<script>
+  function checkPassword() {
+    var password = document.getElementById("password").value;
+    var confirmPassword = document.getElementById("confirmPassword").value;
+
+    if (password != confirmPassword) {
+        alert("Passwords do not match!");
+        return false;
+    }
+    return true;
+  }
+
+  function validatePhoneNumber() {
+    var phoneNumber = document.getElementById("phoneNumber").value;
+    if (phoneNumber.length !== 10) {
+        alert("Phone number must be exactly 10 digits!");
+        return false;
+    }
+    return true;
+  }
+
+  function validateForm() {
+    return checkPassword() && validatePhoneNumber();
+  }
+</script>
+{% endblock script %}

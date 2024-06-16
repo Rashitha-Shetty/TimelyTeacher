@@ -1,0 +1,330 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block meta %}
+  <meta name="csrf-token" content="{{ csrf_token }}" />
+{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link rel="stylesheet" href="{% static 'css/timetables.css'%}">
+{% endblock styles %}
+
+{% block nav_content %}
+<a href="#" onclick="showDay('Monday')"><i>M</i><span>-Monday</span></a>
+<a href="#" onclick="showDay('Tuesday')"><i>T</i><span>-Tuesday</span></a>
+<a href="#" onclick="showDay('Wednesday')"><i>W</i><span>-Wednesday</span></a>
+<a href="#" onclick="showDay('Thursday')"><i>T</i><span>-Thursday</span></a>
+<a href="#" onclick="showDay('Friday')"><i>F</i><span>-Friday</span></a>
+<a href="#" onclick="showDay('Saturday')"><i>S</i><span>-Saturday</span></a>
+
+
+<br><br>
+<a href="#" id="save-button"><i class="fas fa-address-card"></i><span>Save</span></a>
+<a href="logout" onclick="confirmLogOut()"><i class="fas fa-bullhorn"></i><span>Log Out</span></a>
+{% endblock nav_content %}
+
+{% block maincontent %}
+<div class="body">
+    <div id="schedule-container"></div>
+</div>
+{% endblock maincontent %}
+
+{% block script %}
+<script>
+    var teachersList = [];
+    var subjectsList = [];
+    var timetableDataFromServer = {{ timetable|safe }}; // Add this line to get the timetable data from the server
+
+    // Function to add a teacher to the list
+    function populateTeacher(name, username) {
+        let teacher = {
+            name: name,
+            username: username
+        };
+        teachersList.push(teacher);
+    }
+
+    // Function to add a subject and its assigned teacher to the list
+    function addSubject(subject, teacherUsername) {
+        subjectsList.push({ subject: subject.toString(), teacherUsername: teacherUsername.toString() });
+    }
+
+    {% for teacher in teachers %}
+        populateTeacher(
+            "{{ teacher.Name }}",
+            "{{ teacher.Username }}"
+        );
+    {% endfor %}
+
+    {% for subject in subjects %}
+        addSubject(
+            "{{ subject.Subject }}",
+            "{{ subject.Username }}"
+        );
+    {% endfor %}
+</script>
+<script>
+    let days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    let startTime = 8;
+    let startMinute = 30;
+    let numberOfSubjects = 8;
+
+    let selectedValues = {}; // Object to store selected values for each day and slot
+
+    function createTimeSlots(startHour, startMinute, numberOfSlots) {
+        let times = [];
+        for (let i = 0; i < numberOfSlots; i++) {
+            if (startHour === 12 && startMinute === 30) {
+                startHour++;
+                continue;
+            }
+
+            let endHour = startHour + 1;
+            let start = `${startHour}:${startMinute < 10 ? '0' + startMinute : startMinute} `;
+            let end = `${endHour}:${startMinute < 10 ? '0' + startMinute : startMinute} `;
+
+           
+            
+
+            if (endHour > 12) {
+                endHour -= 12;
+                end = `${endHour}:${startMinute < 10 ? '0' + startMinute : startMinute} `;
+            }
+            if (startHour > 12) {
+                startHour -= 12;
+                start = `${startHour}:${startMinute < 10 ? '0' + startMinute : startMinute} `;
+            }
+
+            times.push(`${start} - ${end}`);
+            startHour++;
+        }
+        return times;
+    }
+
+    function createSchedule(day) {
+        let scheduleContainer = document.getElementById('schedule-container');
+        let dayCard = document.createElement('div');
+        dayCard.className = 'day-card';
+        dayCard.id = day;
+        dayCard.classList.add('hide');
+
+        let dayTitle = document.createElement('h2');
+        dayTitle.textContent = day;
+        dayCard.appendChild(dayTitle);
+
+        let timeSlots = createTimeSlots(startTime, startMinute, numberOfSubjects);
+        timeSlots.forEach((slot, index) => {
+            let subjectItem = document.createElement('div');
+            subjectItem.className = 'subject-item';
+
+            let timingDiv = document.createElement('div');
+            timingDiv.className = 'timings';
+            timingDiv.textContent = slot;
+            subjectItem.appendChild(timingDiv);
+
+            let subjectDropdown = document.createElement('select');
+            subjectDropdown.className = 'subject-dropdown';
+            subjectDropdown.setAttribute('data-day', day); // Set data-day attribute
+            subjectDropdown.setAttribute('data-index', index); // Set data-index attribute
+            
+            // Create the default "Select Subject" option
+            let defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'Select Subject';
+            subjectDropdown.appendChild(defaultOption);
+
+            subjectsList.forEach(subject => {
+                let option = document.createElement('option');
+                option.value = subject.subject;
+                option.textContent = subject.subject;
+                subjectDropdown.appendChild(option);
+            });
+
+            // Add onchange event to update teacher dropdown based on selected subject
+            subjectDropdown.addEventListener('change', function() {
+                let selectedSubject = this.value;
+                let teacherDropdown = this.nextElementSibling;
+                
+                // Clear previous options
+                while (teacherDropdown.options.length > 1) {
+                    teacherDropdown.remove(1);
+                }
+
+                if (selectedSubject === '') {
+                    teacherDropdown.value = '';
+                } else {
+                    let assignedTeacherUsername = subjectsList.find(sub => sub.subject === selectedSubject).teacherUsername;
+                    let assignedTeacher = teachersList.find(teacher => teacher.username === assignedTeacherUsername);
+                    
+                    // Add new teacher option
+                    if (assignedTeacher) {
+                        let option = document.createElement('option');
+                        option.value = assignedTeacher.username;
+                        option.textContent = assignedTeacher.name;
+                        teacherDropdown.appendChild(option);
+                        teacherDropdown.value = assignedTeacher.username;
+                    }
+                }
+
+                saveSelectedValue(day, index, 'subject', selectedSubject);
+                saveSelectedValue(day, index, 'teacher', selectedSubject === '' ? '' : assignedTeacher.username);
+            });
+
+            subjectItem.appendChild(subjectDropdown);
+
+            let teacherDropdown = document.createElement('select');
+            teacherDropdown.className = 'teacher-dropdown';
+            teacherDropdown.setAttribute('data-day', day); // Set data-day attribute
+            teacherDropdown.setAttribute('data-index', index); // Set data-index attribute
+            
+            // Create the default "Select" option
+            let defaultTeacherOption = document.createElement('option');
+            defaultTeacherOption.value = '';
+            defaultTeacherOption.textContent = 'Select';
+            teacherDropdown.appendChild(defaultTeacherOption);
+
+            teacherDropdown.addEventListener('change', function() {
+                saveSelectedValue(day, index, 'teacher', this.value);
+            });
+
+            subjectItem.appendChild(teacherDropdown);
+            dayCard.appendChild(subjectItem);
+        });
+
+        scheduleContainer.appendChild(dayCard);
+    }
+
+    function saveSelectedValue(day, index, type, value) {
+        if (!selectedValues[day]) {
+            selectedValues[day] = [];
+        }
+        if (!selectedValues[day][index]) {
+            selectedValues[day][index] = {};
+        }
+        selectedValues[day][index][type] = value;
+    }
+
+    function showDay(day) {
+        let all = document.querySelectorAll(".day-card");
+        all.forEach(card => {
+            card.classList.add("hide");
+        });
+        document.getElementById(day).classList.remove("hide");
+    }
+
+    // Populate the dropdowns based on timetable data from the server
+    function populateTimetable() {
+        for (let key in timetableDataFromServer) {
+            if (timetableDataFromServer.hasOwnProperty(key)) {
+                let [day, index] = key.split('_');
+                index = parseInt(index, 10);
+                let subject = timetableDataFromServer[key].Subject;
+                let teacherUsername = timetableDataFromServer[key].TeacherUsername;
+
+                saveSelectedValue(day, index, 'subject', subject);
+                saveSelectedValue(day, index, 'teacher', teacherUsername);
+            }
+        }
+
+        days.forEach(day => {
+            createSchedule(day);
+        });
+
+        for (let key in selectedValues) {
+            if (selectedValues.hasOwnProperty(key)) {
+                let dayCard = document.getElementById(key);
+                selectedValues[key].forEach((value, index) => {
+                    let subjectDropdown = dayCard.querySelector(`.subject-dropdown[data-index="${index}"]`);
+                    let teacherDropdown = dayCard.querySelector(`.teacher-dropdown[data-index="${index}"]`);
+
+                    if (value.subject) {
+                        subjectDropdown.value = value.subject;
+                        let event = new Event('change');
+                        subjectDropdown.dispatchEvent(event);
+                    }
+
+                    if (value.teacher) {
+                        teacherDropdown.value = value.teacher;
+                    }
+                });
+            }
+        }
+    }
+
+    // By default, show Monday's schedule
+    populateTimetable();
+    
+
+    // Function to save timetable data as JSON
+    function getCSRFToken() {
+        return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    }
+
+    function saveTimetable() {
+        showLoadingSpinner()
+        let timetableData = {};
+
+        days.forEach(day => {
+            let dayData = [];
+            let dayContainer = document.getElementById(day);
+            let hour_count = 0;
+
+            dayContainer.querySelectorAll('.subject-item').forEach((item, index) => {
+                let subjectDropdown = item.querySelector('.subject-dropdown');
+                let teacherDropdown = item.querySelector('.teacher-dropdown');
+
+                let subject = subjectDropdown.value;
+                let teacher = teacherDropdown.value;
+
+                if (subject && teacher) {
+                    dayData.push({
+                        subject: subject,
+                        teacher: teacher,
+                        hour: hour_count
+                    });
+                }
+                hour_count++;
+            });
+
+            timetableData[day] = dayData;
+        });
+
+        console.log(JSON.stringify(timetableData, null, 2));
+
+        const csrftoken = getCSRFToken();
+        const formData = {
+            ClassId: "{{ClassId}}",
+            timeTable: timetableData
+        };
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '{% url "saveTimetable" %}', true);
+        xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+        xhr.setRequestHeader('X-CSRFToken', csrftoken);
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    alert('Time Table Updated successfully.');
+                    hideLoadingSpinner()
+                    //location.reload(); // Reload the page to see the imported data
+                } else {
+                    alert('Failed to Update Time Table');
+                    hideLoadingSpinner()
+                }
+            }
+        };
+
+        xhr.send(JSON.stringify(formData));
+    }
+
+    // Add event listener to the save button
+    document.getElementById('save-button').addEventListener('click', function() {
+        saveTimetable();
+    });
+
+    showDay("Monday");
+    
+</script>
+{% endblock script %}

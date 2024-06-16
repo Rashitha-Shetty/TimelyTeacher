@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/view_attendence.css' %}">
+{% endblock styles %}
+
+{% block nav_content %}
+<br><br><br><br><br>
+
+<a href="#" onclick="window.history.back()"><i class="fas fa-user-graduate"></i><span>Students</span></a>
+<a href="#" onclick="submitForm('subjectsForm')"><i class="fas fa-chalkboard-teacher"></i><span>Subjects</span></a>
+<a href="#" onclick="submitForm('timetableForm')"><i class="fas fa-calendar-alt"></i><span>Timetable</span></a>
+<a href="#" onclick="submitForm('card4Form')"><i class="fas fa-folder"></i><span>Attendance</span></a>
+
+<br><br><br><br><br>
+<a href="/manage"><i class="fas fa-desktop"></i><span>Home</span></a>
+<a href="logout" onclick="confirmLogOut()" class="down"><i class="fas fa-bullhorn"></i><span>Log Out</span></a>
+
+<form id="studentsForm" action="{% url 'students' %}" method="get" style="display: none;">
+    <h2 style="color: #FF5733;">Manage Students</h2>
+    <input type="hidden" name="classid" value="{{ data.classid }}">
+</form>
+<form id="subjectsForm" action="{% url 'subjects' %}" method="post" style="display: none;">
+    {% csrf_token %}
+    <h2 style="color: #33B5FF;">Manage Subjects</h2>
+    <input type="hidden" name="classid" value="{{ data.classid }}">
+</form>
+<form id="timetableForm" action="{% url 'timetable' %}" method="post" style="display: none;">
+    {% csrf_token %}
+    <h2 style="color: #33FF57;">Manage Timetable</h2>
+    <input type="hidden" name="classid" value="{{ data.classid }}">
+</form>
+<form id="card4Form" action="{% url 'viewattendence' %}" method="post" style="display: none;">
+    {% csrf_token %}
+    <h2 style="color: #FF33A8;">Card Title 4</h2>
+    <input type="hidden" name="classid" value="{{ data.classid }}">
+</form>
+
+<script>
+    function submitForm(formId) {
+        document.getElementById(formId).submit();
+    }
+</script>
+{% endblock nav_content %}
+
+{% block maincontent %}
+<h1>Attendance Report</h1>
+<center>
+<div id="report">
+    <!-- Tables will be injected here by JavaScript -->
+</div>
+</center>
+{% endblock maincontent %}
+
+{% block script %}
+<script>
+
+let data = [];
+
+function addAttendanceRecord(ClassId, Date, Hour, Name, Rollno, Subject, is_present) {
+    data.push({
+        ClassId: ClassId,
+        Date: Date,
+        Hour: Hour,
+        Name: Name,
+        Rollno: Rollno,
+        Subject: Subject,
+        id: generateId(),
+        is_present: is_present
+    });
+    renderReport();
+}
+
+function generateId() {
+    return 'id-' + Math.random().toString(36).substr(2, 16);
+}
+
+function renderReport() {
+    const students = {};
+
+    data.forEach(record => {
+        if (!students[record.Name]) {
+            students[record.Name] = {
+                rollno: record.Rollno,
+                subjects: {}
+            };
+        }
+        if (!students[record.Name].subjects[record.Subject]) {
+            students[record.Name].subjects[record.Subject] = {
+                total: 0,
+                attended: 0
+            };
+        }
+        students[record.Name].subjects[record.Subject].total++;
+        if (record.is_present === 'True') { // Ensure to compare against string 'True'
+            students[record.Name].subjects[record.Subject].attended++;
+        }
+    });
+
+    const reportDiv = document.getElementById('report');
+    reportDiv.innerHTML = ''; // Clear existing content
+
+    Object.keys(students).forEach(name => {
+        const student = students[name];
+
+        const tableContainer = document.createElement('div');
+        tableContainer.className = 'table-container';
+
+        const table = document.createElement('table');
+        const thead = document.createElement('thead');
+        const tbody = document.createElement('tbody');
+
+        thead.innerHTML = `
+            <tr>
+                <th>Subject</th>
+                <th>Classes Attended</th>
+                <th>Total Classes</th>
+            </tr>
+        `;
+
+        Object.keys(student.subjects).forEach(subject => {
+            const subjectData = student.subjects[subject];
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${subject}</td>
+                <td>${subjectData.attended}</td>
+                <td>${subjectData.total}</td>
+            `;
+            tbody.appendChild(row);
+        });
+
+        table.appendChild(thead);
+        table.appendChild(tbody);
+
+        tableContainer.appendChild(table);
+
+        const summary = document.createElement('div');
+        summary.className = 'summary';
+        summary.textContent = `Student: ${name} (Roll No: ${student.rollno})`;
+
+        reportDiv.appendChild(summary);
+        reportDiv.appendChild(tableContainer);
+    });
+}
+
+{% for each in data %}
+addAttendanceRecord(
+"{{ each.ClassId }}",
+"{{ each.Date }}",
+"{{ each.Hour }}",
+"{{ each.Name }}",
+"{{ each.Rollno }}",
+"{{ each.Subject }}",
+"{{ each.is_present }}"
+);
+{% endfor %}
+
+</script>
+{% endblock script %}

@@ -1,0 +1,312 @@
+.hide{
+    display: none;
+}
+
+.message-box-alert {
+    width: 100%;
+    height: 2.5em;
+    background-color: #1ad4bd; /* Green background color */
+    color: #000000; /* White text color */
+    text-align: center;
+    padding: 0.5em 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000; /* Ensure it's above other content */
+    display: none;
+  }
+  
+  /* Style for the message text */
+  .message-text {
+    font-size: 15px;
+    text-align: center;
+    justify-content: center;
+   
+  }
+  /* nav styles */
+  .header_nav{
+    position:sticky;
+    top:0;
+    left:0;
+    width:100%;
+    height:2.5rem;
+    padding:10px 0;
+    background:#000000;
+    color: azure;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+    max-width: var(--mx-width);
+    margin: auto;
+}
+
+
+
+
+.navbar a {
+    font-size:1.4rem;
+    color:white;
+    margin-right: 1em;
+    transition: .3s;
+    text-decoration: none;
+
+}
+.header_nav h4{
+  padding-left: 1em;
+}
+
+.navbar a:hover {
+    color:green;
+
+}
+
+#menu-icon{
+    font-size: 3.6rem;
+    color: rgb(255, 255, 255);
+    display: none;
+}
+
+
+.active_open{
+  color: white !important;
+}
+
+
+/* ... Your existing CSS ... */
+
+/* Responsive */
+@media (max-width:1200px){
+    .header{
+        height: 3rem;
+    }
+}
+
+@media (max-width:991px) {
+    .header {
+        padding: 1.6rem 1.7em;
+    }
+
+    .logo{
+        font-size:1rem;
+    }
+    .logo_img{
+      width:2em;
+    }
+    
+}
+
+@media (max-width: 1300px) {
+    #menu-icon {
+        display: block;
+        font-size: 3rem;
+    }
+
+    .navbar {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        padding: 1rem 3%;
+        border-top: .1rem solid rgba(0, 0, 0, 0);
+        box-shadow: 0 .5rem 1rem rgba(112, 111, 111, 0);
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease, background 0.3s ease;  /* Add transition for max-height property */
+    }
+
+    .navbar.active {
+        background: rgba(0, 0, 0, 0.922);
+        border-top: .1rem solid rgba(0, 0, 0, .2);
+        box-shadow: 0 .5rem 1rem rgba(112, 111, 111, 0.169);
+        max-height: 500px; /* Set a value large enough to accommodate your content */
+        transition: max-height 0.3s ease, background 0.3s ease;  /* Add transition for max-height property */
+    }
+
+    .navbar a {
+        display: block;
+        font-size: 1rem;
+        margin: 1.5rem 0;
+        text-align: center;
+    }
+}
+
+
+
+
+
+.hide{
+    display: none;
+
+}
+
+
+
+
+a:link {
+    text-decoration: none;
+  }
+  
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: "Roboto", sans-serif;
+  }
+  
+  header {
+    position: fixed;
+    background: #22242A;
+    padding: 20px;
+    width: 100%;
+    z-index: 1;
+    top: 0;
+  }
+  
+  .left_area h3 {
+    color: #fff;
+    margin: 0px;
+    text-transform: uppercase;
+    font-size: 22px;
+    font-weight: 900;
+  }
+  
+  .left_area span {
+    color: #19B3D3;
+  }
+  
+  .logout_btn, .home_btn {
+    padding: 5px;
+    background: #19B3D3;
+    text-decoration: none;
+    float: right;
+    margin-top: -30px;
+    margin-right: 40px;
+    border-radius: 2px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    transition: 0.5s;
+  }
+  
+  .logout_btn:hover, .home_btn:hover {
+    background: #0B87A6;
+  }
+  
+  .sidebar {
+    background: #2f323a;
+    /* margin-top: 70px;  */
+    z-index: 1;
+    padding-top: 30px;
+    position: fixed;
+    left: 0;
+    top:0;
+    width: 250px;
+    height: 100%;
+    transition: 0.5s;
+    transition-property: left;
+  }
+  
+  .sidebar .profile_image {
+    width: 100px;
+    height: 100px;
+    border-radius: 100px;
+    margin-bottom: 10px;
+  }
+  
+  .sidebar h4 {
+    color: #ccc;
+    margin-top: 0;
+    margin-bottom: 20px;
+  }
+  
+  .sidebar a {
+    color: #fff;
+    display: block;
+    width: 100%;
+    line-height: 60px;
+    text-decoration: none;
+    padding-left: 40px;
+    box-sizing: border-box;
+    transition: 0.5s;
+  }
+  
+  .sidebar a:hover {
+    background: #19B3D3;
+  }
+  
+  .sidebar i {
+    padding-right: 10px;
+  }
+  
+  label #sidebar_btn {
+    z-index: 2;
+    color: #fff;
+    position: fixed;
+    cursor: pointer;
+    /* left: 300px; */
+    font-size: 20px;
+    top:0;
+    margin: 15px 0 0 20px;
+    transition: 0.5s;
+    transition-property: color;
+  }
+  
+  label #sidebar_btn:hover {
+    color: #19B3D3;
+  }
+  
+  #check:checked~.sidebar {
+    left: -190px;
+  }
+  
+  #check:checked~.sidebar a span {
+    display: none;
+  }
+  
+  #check:checked~.sidebar a {
+    font-size: 20px;
+    margin-left: 170px;
+    width: 80px;
+  }
+  
+  .content {
+    margin-left: 250px;
+    padding-top: 70px; /* Ensure content starts below the fixed header */
+    background: url(background.png) no-repeat;
+    background-position: center;
+    background-size: cover;
+    height: 100vh;
+    transition: 0.5s;
+  }
+  
+  #check:checked~.content {
+    margin-left: 60px;
+  }
+  
+  #check {
+    display: none;
+  }
+  
+
+  .loading-spinner {
+    position: fixed;
+    top: 5%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 10px solid #f3f3f3;
+    border-top: 10px solid #3498db;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 2s linear infinite;
+    z-index: 1000;
+}
+.disabled-on-load{
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

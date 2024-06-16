@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/view_student.css' %}">
+{% endblock styles %}
+
+{% block nav_content %}
+
+<br><br><br><br><br>
+
+    <a href="#" onclick="window.history.back()"><i class="fas fa-user-graduate"></i><span>Students</span></a>
+    <a href="#" onclick="submitForm('subjectsForm')"><i class="fas fa-chalkboard-teacher"></i><span>Subjects</span></a>
+    <a href="#" onclick="submitForm('timetableForm')"><i class="fas fa-calendar-alt"></i><span>Timetable</span></a>
+    <a href="#" onclick="submitForm('card4Form')"><i class="fas fa-folder"></i><span>Attendance</span></a>
+
+
+    <br><br><br><br><br>
+    <a href="/manage"><i class="fas fa-desktop"></i><span>Home</span></a>
+    <a href="logout" onclick="confirmLogOut()" class="down"><i class="fas fa-bullhorn"></i><span>Log Out</span></a>
+
+
+
+    <form id="studentsForm" action="{% url 'students' %}" method="get" style="display: none;">
+        <h2 style="color: #FF5733;">Manage Students</h2>
+        <input type="hidden" name="classid" value="{{ data.classid }}">
+    </form>
+    <form id="subjectsForm" action="{% url 'subjects' %}" method="post" style="display: none;">
+        {% csrf_token %}
+        <h2 style="color: #33B5FF;">Manage Subjects</h2>
+        <input type="hidden" name="classid" value="{{ data.classid }}">
+    </form>
+    <form id="timetableForm" action="{% url 'timetable' %}" method="post" style="display: none;">
+        {% csrf_token %}
+        <h2 style="color: #33FF57;">Manage Timetable</h2>
+        <input type="hidden" name="classid" value="{{ data.classid }}">
+    </form>
+    <form id="card4Form" action="{% url 'viewattendence' %}" method="post" style="display: none;">
+        {% csrf_token %}
+        <h2 style="color: #FF33A8;">Card Title 4</h2>
+        <input type="hidden" name="classid" value="{{ data.classid }}">
+    </form>
+
+    
+    <script>
+        function submitForm(formId) {
+            document.getElementById(formId).submit();
+        }
+    </script>
+
+
+{% endblock nav_content %}
+
+
+{% block maincontent %}
+
+    <div class="container">
+      <center><h3>Student</h3></center>
+      <br />
+      <form method="post" action="{% url 'students'%}">
+        {% csrf_token %}
+        <input type="hidden" name="classid" value="{{data.classid}}">
+        <label>Reg No</label>
+        <input type="text" name="Regno" value="{{data.Regno}}" required disabled/>
+        <br />
+
+        <label>Roll No</label>
+        <input type="text"  name="Rollno" value="{{data.Rollno}}" required disabled/>
+        <br />
+        <label>Name</label>
+        <input
+          type="text"
+          name="Name"
+          value="{{data.Name}}"
+          required disabled
+        />
+
+        <label for="phoneNumber">Phone Number</label>
+        <input
+          type="tel"
+          id="phoneNumber"
+          name="Phoneno"
+          value="{{data.Phoneno}}"
+          pattern="\d{10}"
+          maxlength="10"
+          minlength="10"
+          required disabled
+        /><br /><br>
+
+        <input type="hidden" name="docid" value="{{data.docid}}">
+
+        <button id="editCancelButton" type="button" name-"edit">Edit</button>
+
+        <button type="submit" name="delete" onclick="return confirmDelete()">Delete</button>
+
+        <button type="submit" name="savebtn" id="savebtn" class="hide">Save</button>
+      </form>
+    </div>
+{% endblock maincontent %}
+
+
+{% block script %}
+<script>
+    document.querySelector('#editCancelButton').addEventListener('click', function(event) {
+        event.preventDefault();
+        var editCancelButton = document.getElementById('editCancelButton');
+        var editMode = editCancelButton.textContent === 'Edit';
+        var inputs = document.querySelectorAll('.container form input');
+        
+        inputs.forEach(function(input) {
+          input.disabled = !editMode;
+        });
+        
+        editCancelButton.textContent = editMode ? 'Cancel' : 'Edit';
+        
+        document.getElementById('savebtn').classList.toggle('hide');
+    
+    
+      });
+    
+    
+      function confirmDelete() {
+        // Prompt the user for confirmation
+        var result = confirm("Are you sure you want to delete?");
+    
+        // If user confirms, proceed with form submission
+        if (result) {
+          return true;
+        } else {
+          // If user cancels, prevent the form submission
+          return false;
+        }
+      }
+</script>
+
+{% endblock script %}

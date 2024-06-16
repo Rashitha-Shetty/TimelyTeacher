@@ -1,0 +1,107 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block meta %}{% endblock meta %}
+    <title>TimelyTeacher</title>
+
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" >
+    
+    {% block styles %} {% endblock styles %}
+
+</head>
+<body>
+  {% block spinner %}
+  <div id="loading-spinner" class="loading-spinner hide"></div> 
+  {% endblock spinner %}
+
+    {% if logOut %}
+    <script>
+        // Remove an item from local storage
+        localStorage.removeItem("username");
+        localStorage.removeItem("password");
+        window.location.href = '/home';
+    </script>
+   
+
+    {% elif saveLogin %}
+      <script>
+            // Ensure username and password are properly quoted and escaped
+          var username = "{{ username|escapejs }}";
+          var password = "{{ password|escapejs }}";
+          console.log(username, password);
+          localStorage.setItem("username", username);
+          localStorage.setItem("password", password);
+      </script>
+
+    {% elif not home %} 
+      <script>
+          // To retrieve the saved data later:
+          let savedUsername = localStorage.getItem("username");
+          let savedPassword = localStorage.getItem("password");
+
+          if (savedUsername && savedPassword) {}
+          else{
+            //redirect to home
+            console.log("hear")
+           window.location.href = '/home';
+          }
+      </script>
+
+    {% endif %}
+    
+   
+
+    
+
+    
+    {% for msg in messages %}
+        <div class="message-box-alert" id="messageBox">
+            <p class="message-text">{{msg}}</p>
+        </div>
+    {% endfor %}
+
+
+    {% block nav %}
+        
+        <input type="checkbox" id="check">
+        <!--sidebar start-->
+        <label for="check">
+            <i class="fas fa-bars" id="sidebar_btn"></i>
+          </label>
+        <div class="sidebar">
+          <center>
+            <img src="{% static 'images/admin.png' %}" class="profile_image" alt="">
+            <h4>{% block username %}Admin{% endblock username %}</h4>
+          </center>
+
+          {% block nav_content %}
+              
+            <br><br><br><br><br><br>
+            <a href="/admin"><i class="fas fa-desktop"></i><span>Home</span></a>
+            <a href="logout" onclick="confirmLogOut()"><i class="fas fa-bullhorn"></i><span>Log Out</span></a>
+                
+          {% endblock nav_content %}
+        </div>
+          
+          <!--sidebar end-->
+    {% endblock nav %}
+
+
+   
+
+    {% block maincontent %}{% endblock maincontent  %}
+
+    <script>
+      {% comment %} window.history.replaceState('Object', 'Title', ' ');  {% endcomment %}
+  </script>
+
+    <script src="{% static 'script/base.js' %}"></script>
+    {% block script %}{% endblock script %} 
+    
+</body>
+</html>

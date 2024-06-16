@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/man_teach.css' %}" />
+{% endblock styles %}
+
+
+{% block nav_content %}
+
+<br><br><br><br><br>
+
+    <a href="teachers"><i class="fas fa-chalkboard-teacher"></i><span>Manage Teachers</span></a>
+    <a href="class"><i class="fas fa-user-graduate"></i><span>Manage Class</span></a>
+
+    <br><br><br><br><br>
+    <a href="logout" onclick="confirmLogOut()" class="down"><i class="fas fa-bullhorn"></i><span>Log Out</span></a>
+
+{% endblock nav_content %}
+
+
+{% block maincontent  %}
+    <center>
+    <h2>Timely Teachers</h2>
+  </center>
+    {% if data %} 
+    {% for member in data %}
+    <form action="{% url 'teacherdetails' %}" method="post" id="form_{{member.id}}">
+      {% csrf_token %}
+    <div class="box" id="{{member.id}}">
+      <h3>{{forloop.counter}} &nbsp {{member.Name}}</h3>
+      <p>{{member.Department}}</p>
+
+    <input type="hidden"
+        name="docid"
+        value="{{member.id}}"
+      />
+    <input type="hidden"
+        name="name"
+        value="{{member.Name}}"
+      />
+      <input
+        type="hidden"
+        name="department"
+        value="{{member.Department}}"
+      />
+      <input
+        type="hidden"
+        name="phoneno"
+        value="{{member.Phoneno}}"
+      />
+      <input
+        type="hidden"
+        name="username"
+        value="{{member.Username}}"
+      />
+      <input
+        type="hidden"
+        name="password"
+        value="{{member.Password}}"
+      />
+    </div></form>
+    {% endfor %} {% else %}
+    <div class="box" >
+      <h2>No Teachers</h2>
+      <p>Add Teachers</p>
+    </div>
+    {% endif %}
+ 
+    <form action="{% url 'teachers' %}" method="post">
+      {% csrf_token %}
+      <button type="submit" class="add-button" id="plusBtn">+</button>
+    </form>
+
+{% endblock maincontent  %}
+
+{% block script %}
+    <script>
+      document.querySelectorAll('.box').forEach(function(box) {
+        box.addEventListener('click', function() {
+          // Extract the ID of the box
+          var boxId = box.id;
+          // Construct the form ID
+          var formId = 'form_' + boxId;
+          // Find the form element by its ID
+          var form = document.getElementById(formId);
+          // Submit the form
+          form.submit();
+        });
+      });
+    </script>
+{% endblock script %}
+    
+    

@@ -1,0 +1,185 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f5f7fa; /* Light grey background for better contrast */
+  margin: 0;
+  padding: 0;
+  color: #333; /* Slightly darker text color for better readability */
+}
+
+/* Style for the box */
+.box {
+  width: 40vw;
+  margin: 20px auto;
+  padding: 20px; /* Increased padding for better spacing */
+  background: linear-gradient(145deg, #cfdff1, #99acd5); /* Light blue gradient background */
+  border: 2px solid #99acd5; /* Light blue border color */
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  transition: border 0.3s ease, background 0.3s ease; /* Smooth transition on hover */
+}
+
+.box:hover {
+  background: linear-gradient(145deg, #b5c7e0, #809abf); /* Slightly darker blue gradient on hover */
+  border: 2px solid #809abf; /* Darker blue border on hover */
+}
+
+/* Container to center content vertically */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full viewport height */
+}
+
+/* Style for the add button */
+.add-button {
+  position: absolute;
+  bottom: 100px;
+  right: 40px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #0077b6, #00b4d8); /* Gradient background in ocean blue shades */
+  color: #ffffff;
+  font-size: 30px; /* Larger font size for better visibility */
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease; /* Smooth transition for background and transform */
+}
+
+.add-button:hover {
+  background: linear-gradient(145deg, #004e98, #0086b3); /* Slightly darker gradient on hover */
+  transform: scale(1.1); /* Slightly enlarge the button on hover */
+}
+
+/* Popup styles */
+.popup {
+  position: fixed;
+  width: 80%;
+  font-size: 1.3em;
+  transform: translate(-50%, -50%);
+  overflow: auto;
+  scrollbar-width: none;
+  top: 50%;
+  left: 50%;
+  background-color: #cfdff1; /* Light blue background */
+  padding: 20px;
+  border: 1px solid #99acd5; /* Lighter blue border */
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  width: 90%;
+}
+
+.popup::-webkit-scrollbar {
+  display: none;
+}
+
+.popup form label {
+  display: inline-block; /* Change from block to inline-block */
+  margin-bottom: 10px;
+  width: 40%; /* Adjusted width */
+  text-align: left; /* Align labels to the right */
+  color: #666; /* Darker grey text */
+}
+
+.popup form input,
+.popup form textarea,
+.popup form button {
+  display: inline-block; /* Change from block to inline-block */
+  margin-bottom: 10px;
+  width: 90%; /* Adjusted width */
+  border-radius: 5px;
+  background-color: #ffffffc2; /* Lighter background color */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  border: none;
+  padding: 8px; /* Adjusted padding */
+}
+
+.popup form button {
+  width: 8em; /* Auto width for button */
+  margin-top: 2em;
+  margin-left: 40px; /* Remove left margin for button */
+}
+
+#closeButton{
+  background: #ff0000;
+  border-radius: 18px;
+  height: 2em;
+  width: 2em;
+  position: absolute;
+  border: none;
+  color: white;
+  margin-right: 2em;
+  right: 0;
+}
+.popup form button:hover {
+  background-color: #005692; /* Slightly darker blue on hover */
+}
+
+.input-group {
+  margin-bottom: 10px;
+}
+
+input[type="text"]{
+  width: calc(90% - 80px); /* Adjusted for label width */
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #ffffffc2;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  /* margin-left: 40px; */
+}
+
+#year{
+  width: 94%; /* Adjusted for label width */
+  padding: 10px;
+  /* margin-left: 40px; */
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #ffffffc2;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Edit Button */
+.set_float, .editButton {
+  position: fixed;
+  width: 50px;
+  height: 50px;
+  bottom: 90px;
+  right: 40px;
+  background-color: #84f0b6; /* Light green */
+  color: #000000;
+  border: none;
+  border-radius: 50px;
+  text-align: center;
+  font-size: 36px;
+  z-index: 1000; /* Ensure it's above other elements */
+}
+
+.editButton {
+  background-color: #007bff00; /* Transparent */
+  bottom: 100px;
+}
+
+.editButton:hover {
+  background-color: #007bff33; /* Slightly transparent blue */
+}
+
+@media (max-width: 600px) {
+  .popup {
+    max-width: 300px;
+  }
+
+  label {
+    width: auto;
+    display: block;
+    margin-left: 20px;
+  }
+
+  input[type="text"],
+  select {
+    width: calc(100% - 40px); /* Adjusted for smaller screen */
+    margin-left: 20px;
+  }
+}

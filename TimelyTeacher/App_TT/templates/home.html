@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock styles %}
+{% block spinner %}{% endblock spinner %}
+{% block maincontent %}
+{% block nav %}{% endblock nav %}
+  <div class="hide">
+
+ 
+  <div class="header">
+    <h1>Welcome to Timely Teacher</h1>
+  </div>
+
+  <div class="container">
+    <div class="card" id="card1" onclick="navigateToUrl('{% url "login" %}', 'Admin')">
+      <img class="user-image" src="{% static 'images/admin.png' %}" alt="Admin">
+      <h2>Admin</h2>
+    </div>
+    
+    <div class="card" id="card1" onclick="navigateToUrl('{% url "login" %}', 'Teacher')">
+      <img class="user-image" src="{% static 'images/user.png' %}" alt="User ">
+      <h2>User</h2>
+    </div>
+  </div>
+
+</div>
+
+{% endblock maincontent %}
+
+{% block script %}
+
+  <script>
+    function navigateToUrl(url, data) {
+      // Construct the full URL with data
+      const fullUrl = `${url}?user=${encodeURIComponent(data)}`;
+      // Redirect to the full URL
+      window.location.href = fullUrl;
+    }
+
+    let savedUsername = localStorage.getItem("username");
+    let savedPassword = localStorage.getItem("password");
+
+    if (savedUsername && savedPassword) {
+      window.location.href="/login"
+    }
+    else{
+      document.querySelector('.hide').classList.remove('hide');
+  }
+  </script>
+  
+{% endblock  %}
